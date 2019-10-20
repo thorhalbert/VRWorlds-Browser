@@ -1,0 +1,3 @@
+[submodule "Assets/VRBrowserCommonGRPCProtos"]
+	path = Assets/VRBrowserCommonGRPCProtos
+	url = https://github.com/thorhalbert/VRBrowserCommonGRPCProtos.git
