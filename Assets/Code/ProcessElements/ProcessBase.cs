@@ -27,6 +27,13 @@ namespace VRWorlds.Browser
         protected abstract void AugmentArguments(StringBuilder sb);
         protected abstract void ProcessorLoop();
 
+        protected virtual void ProcessorStart()
+        {
+
+        }
+
+        protected virtual void ProcessorShutdown() { }
+
         private void _processHandler()
         {
             try
@@ -58,7 +65,11 @@ namespace VRWorlds.Browser
 
                     proc.Start();
 
-                    ProcessorLoop();
+                    ProcessorStart();
+
+                    ProcessorLoop();  // Must not let this exit, or we will shutdown
+
+                    ProcessorShutdown();
                 }
             }
             catch (Exception ex) { }

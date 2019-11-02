@@ -3,6 +3,9 @@
     "references": [
         "SteamVR_Windows_EditorHelper",
 		"Unity.ugui"
+	],
+	"add_references": 	[	
+		"Unity.ugui"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],
