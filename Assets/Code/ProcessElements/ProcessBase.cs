@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using UnityEngine;
+using Assets.Code.ProcessElements;
 
 namespace VRWorlds.Browser
 {
@@ -13,6 +14,7 @@ namespace VRWorlds.Browser
         public Guid ProcessId { get; private set; } = Guid.NewGuid();
         protected string LoadFile { get; set; } = null;
         protected Guid AccessToken { get; set; } = Guid.NewGuid();
+        public bool Started { get; protected set; } = false;
 
         public static ProcessBase LoggerProcessor { get; set; } = null;
 
@@ -21,15 +23,18 @@ namespace VRWorlds.Browser
         protected ProcessBase()
         {
             _threadHandle = new Thread(new ThreadStart(_processHandler));
-            _threadHandle.Start();
+         
         }
 
         protected abstract void AugmentArguments(StringBuilder sb);
         protected abstract void ProcessorLoop();
 
-        protected virtual void ProcessorStart()
+        public virtual void ProcessorStart()
         {
+            if (Started) return;
 
+            _threadHandle.Start();
+            Started = true;
         }
 
         protected virtual void ProcessorShutdown() { }
@@ -61,9 +66,12 @@ namespace VRWorlds.Browser
                     proc.StartInfo.FileName = LoadFile;
                     proc.StartInfo.CreateNoWindow = true;
                     proc.StartInfo.Environment.Add("VRWORLDS_GRPC_ACCESS_TOKEN", AccessToken.ToString());
+                    proc.StartInfo.Environment.Add("VRWORLDS_BROWSER_SESSION", ProcessHandler.BrowserSession.ToString());
                     proc.StartInfo.Arguments = startArgs;
 
                     proc.Start();
+
+                    UnityEngine.Debug.Log("Process Started: "+LoadFile);
 
                     ProcessorStart();
 
@@ -72,7 +80,9 @@ namespace VRWorlds.Browser
                     ProcessorShutdown();
                 }
             }
-            catch (Exception ex) { }
+            catch (Exception ex) {
+                UnityEngine.Debug.Log("Error: " + ex.Message);
+            }
         }
     }
 }

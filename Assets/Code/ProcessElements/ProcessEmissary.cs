@@ -9,6 +9,7 @@ using Grpc.Core;
 using Grpc.Core.Utils;
 using VRWorlds.Schemas.Browser.Common;
 using Assets.Code.Lib3DOMImplementation;
+using System.Threading;
 
 namespace VRWorlds.Browser
 {
@@ -36,14 +37,14 @@ namespace VRWorlds.Browser
             GrpcIngressUri = new Uri( "http://localhost:" + port.ToString());
         }
 
-        protected override void ProcessorStart()
+        public override void ProcessorStart()
         {
-            base.ProcessorStart();
-
             var server = new Server { 
                 Services = { VRWorlds.Schemas.Browser.Common.Ping.BindService(new PingImpl()) },
                 Ports = { new ServerPort("loalhost", port, ServerCredentials.Insecure), }
             };
+
+            base.ProcessorStart();  // Launch thread and subprocess
         }
 
         protected override void ProcessorShutdown()
@@ -64,7 +65,7 @@ namespace VRWorlds.Browser
 
         protected override void ProcessorLoop()
         {
-           
+            Thread.Sleep(10000);
         }
     }
 }
