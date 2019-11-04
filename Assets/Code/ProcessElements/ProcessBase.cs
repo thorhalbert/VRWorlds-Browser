@@ -37,6 +37,10 @@ namespace VRWorlds.Browser
             Started = true;
         }
 
+        protected virtual void CreateAndStartService()
+        {
+        }
+
         protected virtual void ProcessorShutdown() { }
 
         private void _processHandler()
@@ -45,6 +49,8 @@ namespace VRWorlds.Browser
             {
                 using (var proc = new Process())
                 {
+                    CreateAndStartService();
+
                     var sb = new StringBuilder();
 
                     sb.Append("--processor-guid ");

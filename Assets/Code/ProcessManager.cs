@@ -15,6 +15,9 @@ public class ProcessManager : MonoBehaviour
         DontDestroyOnLoad(this);
 
         ProcessHandler.Add(new ProcessEmissary() { ProcessorRole = ProcessorRoles.DedicatedAvatar });
+        ProcessHandler.Add(new ProcessEmissary() { ProcessorRole = ProcessorRoles.DedicatedWorld });
+        ProcessHandler.Add(new ProcessEmissary() { ProcessorRole = ProcessorRoles.DedicatedEntity });
+        ProcessHandler.Add(new ProcessEmissary() { ProcessorRole = ProcessorRoles.MeldedEntity });
 
         ProcessHandler.Startup();
     }

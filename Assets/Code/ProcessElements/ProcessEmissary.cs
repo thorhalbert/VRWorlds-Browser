@@ -16,7 +16,7 @@ namespace VRWorlds.Browser
     public class ProcessEmissary : ProcessBase
     {
         public Guid ProcessorRole { get; set; }
-        public Uri GrpcIngressUri { get; private set; }
+        public string GrpcIngressUri { get; private set; }
 
         private static int _port = 10000;
         private static object _portLock = new object();
@@ -34,18 +34,47 @@ namespace VRWorlds.Browser
                 port = _port++;
             }
 
-            GrpcIngressUri = new Uri( "http://localhost:" + port.ToString());
+            //GrpcIngressUri = new Uri( "http://127.0.0.1:" + port.ToString());
         }
+
+
 
         public override void ProcessorStart()
         {
-            var server = new Server { 
-                Services = { VRWorlds.Schemas.Browser.Common.Ping.BindService(new PingImpl()) },
-                Ports = { new ServerPort("loalhost", port, ServerCredentials.Insecure), }
-            };
 
+         
+       
             base.ProcessorStart();  // Launch thread and subprocess
         }
+
+        protected override void CreateAndStartService()
+        {
+            base.CreateAndStartService();
+
+            var conPort = new ServerPort("127.0.0.1", ServerPort.PickUnused, ServerCredentials.Insecure);
+
+            var server = new Server
+            {
+                Services = { VRWorlds.Schemas.Browser.Common.Ping.BindService(new PingImpl(ProcessId)) },
+                Ports = { conPort, }
+            };
+
+            // I don't think we're running in our service thread here -- have to start farther down
+            server.Start();
+
+            var bound = -1;
+            foreach (var p in server.Ports)
+            {
+                if (p.BoundPort > 0)
+                    bound = p.BoundPort;
+                //  Debug.Log("Port: " + p.Port.ToString() + ", bound: "+p.BoundPort.ToString());
+            }
+
+            var host = conPort.Host + ":" + bound.ToString();
+            Debug.Log("Binding to: " + host);
+            GrpcIngressUri = host;
+        }
+
 
         protected override void ProcessorShutdown()
         {
